@@ -14,6 +14,8 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
         th, td {
             border: 1px solid #ddd;
@@ -26,6 +28,11 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        h1 {
+            max-width: 1000px;
+            margin: 0 auto;
+            margin-bottom: 30px;
+        }
         @media (max-width: 600px) {
             th, td {
                 padding: 5px;
@@ -36,13 +43,11 @@
 </head>
 <body>
     <h1>Regional IP Detection</h1>
-    <p>Your IP: <span id="client-ip">Loading...</span></p>
     <table>
         <thead>
             <tr>
                 <th>Country</th>
-                <th>IPv4</th>
-                <th>IPv6</th>
+                <th>IP</th>
             </tr>
         </thead>
         <tbody id="ip-table-body">
@@ -54,21 +59,22 @@
         // Список API-сервисов
         const apiEndpoints = {
             Russia: 'https://ipwhois.app/json/',
-            China: 'https://www.ip138.com/iplookup.asp',
-            Europe: 'https://api64.ipify.org?format=json',
+            China: 'https://myip.ipip.net/json',
+            Europev4: 'https://api.ipify.org?format=json',
+            Europev6: 'https://api64.ipify.org?format=json',
             Iran: 'https://jsonip.com',
-            America: 'https://ipinfo.io/json'
+            // America: 'https://ipinfo.io/json'
         };
 
         // Вывод клиентского IP из локального PHP-скрипта
-        fetch('ip.php')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('client-ip').textContent = data.ip;
-            })
-            .catch(() => {
-                document.getElementById('client-ip').textContent = 'Error fetching IP';
-            });
+        // fetch('ip.php')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         document.getElementById('client-ip').textContent = data.ip;
+        //     })
+        //     .catch(() => {
+        //         document.getElementById('client-ip').textContent = 'Error fetching IP';
+        //     });
 
         // Загрузка IP с разных сервисов
         const tableBody = document.getElementById('ip-table-body');
@@ -78,29 +84,24 @@
             const row = document.createElement('tr');
             const countryCell = document.createElement('td');
             const ipv4Cell = document.createElement('td');
-            const ipv6Cell = document.createElement('td');
             
             countryCell.textContent = country;
             ipv4Cell.textContent = 'Loading...';
-            ipv6Cell.textContent = 'Loading...';
 
             row.appendChild(countryCell);
             row.appendChild(ipv4Cell);
-            row.appendChild(ipv6Cell);
             tableBody.appendChild(row);
 
             // Запрос к API
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    const ipv4 = data.ip || data.origin || 'Unknown';
+                    const ipv4 = data.ip || data.origin || data.data.ip || 'Unknown';
                     const ipv6 = data.ipv6 || 'N/A';
                     ipv4Cell.textContent = ipv4;
-                    ipv6Cell.textContent = ipv6;
                 })
                 .catch(() => {
                     ipv4Cell.textContent = 'Error';
-                    ipv6Cell.textContent = 'Error';
                 });
         });
     </script>
